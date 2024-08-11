@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        width: 50%;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+      }
+      .chat-box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 300px;
+        overflow-y: scroll;
+      }
+      .form-group {
+        margin: 10px 0;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+      }
+      button {
+        padding: 10px 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Chat with <span id="chatUserName">User</span></h1>
+      <div class="chat-box" id="chatBox"></div>
+
+      <div class="form-group">
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <button id="sendMessageBtn">Send</button>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      // Join chat room
+      socket.emit("joinChat", "chatId");
+
+      // Send message
+      document
+        .getElementById("sendMessageBtn")
+        .addEventListener("click", () => {
+          const message = document.getElementById("messageInput").value;
+          socket.emit("sendMessage", {
+            senderId: "userId",
+            recipientId: "recipientId",
+            content: message,
+            chatId: "chatId",
+          });
+          document.getElementById("messageInput").value = "";
+        });
+
+      // Receive message
+      socket.on("receiveMessage", (message) => {
+        const chatBox = document.getElementById("chatBox");
+        chatBox.innerHTML += `<p>${message.sender_id}: ${message.content}</p>`;
+      });
+    </script>
+  </body>
+</html>
